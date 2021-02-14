@@ -9,5 +9,4 @@ Howto
 Todo
 ----
 -	Revoke tokens
--	Configs for Parse( )
 
