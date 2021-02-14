@@ -27,7 +27,6 @@ func TestMain ( test * testing.T ) {
 	token.Expire = 10
 	token.Service = 12
 	config.Service = 32
-	config.Secret = Secret
 	test.Logf( "token: %v" , token.Binary( ) )
 	token , err = config.Cast( token.Binary( ) )
 	if err == nil || err.Error( ) != "TOKEN: Unauthorized" {
