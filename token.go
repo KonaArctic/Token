@@ -76,6 +76,9 @@ func ( self * Token ) Binary( ) [ ]byte {
 	var bytes = make( [ ]byte , binary.MaxVarintLen16 + binary.MaxVarintLen64 + binary.MaxVarintLen32 + binary.MaxVarintLen64 + len( mu( json.Marshal( self.Payload ) )[ 0 ].( [ ]byte ) ) + sha256.Size224 )
 	var index int
 
+	if self.Service == 0 {
+		self.Service = Service }
+
 	binary.PutUvarint( bytes[ 0 : ] , uint64( self.Service ) )
 	index = binary.MaxVarintLen16
 	binary.PutUvarint( bytes[ index : ] , self.Ident )
