@@ -22,7 +22,8 @@ func Authorization( response http.ResponseWriter, request * http.Request ) [ ]To
 			}
 			response.Write( [ ]byte( err.Error( ) ) )
 			response.( http.Flusher ).Flush( )
-			panic( err.Error( ) )
+			//panic( err.Error( ) )
+			panic( nil )
 		}
 		tokens = append( tokens , token )
 	}

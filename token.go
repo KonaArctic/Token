@@ -4,19 +4,14 @@ import "encoding/base64"
 import "encoding/binary"
 import "encoding/json"
 import "errors"
+import "os"
 import "time"
-
-
-//
-// https://stackoverflow.com/a/50346080/10958912 
-func mu( a ... interface{ } ) [ ]interface{ } {
-    return a
-}
 
 
 //
 // Da object
 type Token struct{
+	Secret [ ]byte;
 	Service uint16;
 	Ident uint64;
 	ladder uint32;	// Not in use yet
@@ -57,7 +52,7 @@ func ( self Config )Parse( input string ) ( Token , error ) {
 	var err error
 	var binary [ ]byte
 
-	binary , err = base64.RawStdEncoding.DecodeString( input )
+	binary , err = base64.RawURLEncoding.DecodeString( input )
 	if err != nil {
 		return * new( Token ) , err }
 
@@ -71,6 +66,8 @@ func ( self Config )Cast( input [ ]byte ) ( Token , error ) {
 	var token Token
 	var index int
 
+	if os.Getenv( "AKONA_TOKEN_SECRET" ) != "" {
+		Secret = [ ]byte( os.Getenv( "AKONA_TOKEN_SECRET" ) ) }
 	if self.Secret == nil {
 		self.Secret = Secret }
 	if self.Service == 0 {
@@ -93,7 +90,7 @@ func ( self Config )Cast( input [ ]byte ) ( Token , error ) {
 		return token , err }
 
 	copy( token.sha224[ : sha256.Size224 ] , input[ index : ] )
-	copy( input[ index : ] , self.Secret[ : sha256.Size224 ] )
+	copy( input[ index : index + sha256.Size224 ] , self.Secret )
 	if token.sha224 != sha256.Sum224( input ) {	// Hello timing attacks
 		return token , errors.New( "TOKEN: Invalid" ) }
 	index += sha256.Size224
@@ -113,6 +110,10 @@ func ( self Token ) Binary( ) [ ]byte {
 	var bytes = make( [ ]byte , binary.MaxVarintLen16 + binary.MaxVarintLen64 + binary.MaxVarintLen32 + binary.MaxVarintLen64 + len( mu( json.Marshal( self.Payload ) )[ 0 ].( [ ]byte ) ) + sha256.Size224 )
 	var index int
 
+	if os.Getenv( "AKONA_TOKEN_SECRET" ) != "" {
+		Secret = [ ]byte( os.Getenv( "AKONA_TOKEN_SECRET" ) ) }
+	if self.Secret == nil {
+		self.Secret = Secret }
 	if self.Service == 0 {
 		self.Service = Service }
 	if self.Expire == 0 {
@@ -132,7 +133,7 @@ func ( self Token ) Binary( ) [ ]byte {
 	copy( bytes[ index : ] , [ ]byte( string( json ) + "\n" ) )
 	index -= sha256.Size224
 
-	copy( bytes[ index : ] , Secret[ : sha256.Size224 ] )
+	copy( bytes[ index : index + sha256.Size224 ] , self.Secret )
 	self.sha224 = sha256.Sum224( bytes )	// Why does Sum224 return a byte array?
 	copy( bytes[ index : ] , self.sha224[ : ] )
 
@@ -143,7 +144,7 @@ func ( self Token ) Binary( ) [ ]byte {
 //
 // Or string
 func ( self Token ) String( ) string {
-	return base64.RawStdEncoding.EncodeToString( self.Binary( ) )
+	return base64.RawURLEncoding.EncodeToString( self.Binary( ) )
 }
 
 
