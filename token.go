@@ -17,13 +17,14 @@ type Token struct{
 	ladder uint32;	// Not in use yet
 	Expire int64;
 	Payload interface{ };
-	sha224 [ sha256.Size224 ]byte;
+	sha224 [ sha256.Size224 ]byte;	// ?
 }
 
 
 //
 // Defaults
-var Secret = [ ]byte{ 0xd7, 0xda, 0x66, 0xf7, 0x9b, 0x34, 0xea, 0xea, 0xd7, 0xc1, 0x08, 0xd5, 0x54, 0x0e, 0x13, 0x3c, 0xc7, 0x54, 0x6e, 0x30, 0x82, 0xdc, 0x7c, 0x58, 0xbc, 0xdf, 0xb4, 0xac, 0x7e, 0x6c, 0x65, 0xf2, 0x81, 0x91, 0x5f, 0x7e, 0x72, 0x88, 0x31, 0x55, 0x7c, 0xd8, 0x30, 0x5b, 0x57, 0x2c, 0xa7, 0x24, 0xd5, 0xd3, 0xc6, 0xfe, 0xeb, 0x0f, 0x23, 0x9a, 0x6d, 0x9c, 0x39, 0xcd, 0xcf, 0xeb, 0xf5, 0x8e }
+var Secret = [ ]byte( ternary( os.Getenv( "AKONA_TOKEN_SECRET" ) != "" , os.Getenv( "AKONA_TOKEN_SECRET" ) ,
+	"q7MPygpivEqyG9gC9ue69QeCOvTrScBZ" ).( string ) )
 var Service uint16 = 0
 var Control string = "wss://account.akona.me/control"
 var Expire int64 = 240
@@ -66,10 +67,10 @@ func ( self Config )Cast( input [ ]byte ) ( Token , error ) {
 	var token Token
 	var index int
 
-	if os.Getenv( "AKONA_TOKEN_SECRET" ) != "" {
-		Secret = [ ]byte( os.Getenv( "AKONA_TOKEN_SECRET" ) ) }
 	if self.Secret == nil {
 		self.Secret = Secret }
+	if len( self.Secret ) < sha256.Size224 {
+		panic( "refusing to validate unsecret tokens" ) }
 	if self.Service == 0 {
 		self.Service = Service }
 
@@ -110,10 +111,10 @@ func ( self Token ) Binary( ) [ ]byte {
 	var bytes = make( [ ]byte , binary.MaxVarintLen16 + binary.MaxVarintLen64 + binary.MaxVarintLen32 + binary.MaxVarintLen64 + len( mu( json.Marshal( self.Payload ) )[ 0 ].( [ ]byte ) ) + sha256.Size224 )
 	var index int
 
-	if os.Getenv( "AKONA_TOKEN_SECRET" ) != "" {
-		Secret = [ ]byte( os.Getenv( "AKONA_TOKEN_SECRET" ) ) }
 	if self.Secret == nil {
 		self.Secret = Secret }
+	if len( self.Secret ) < sha256.Size224 {
+		panic( "refusing to generate unsecret tokens" ) }
 	if self.Service == 0 {
 		self.Service = Service }
 	if self.Expire == 0 {
