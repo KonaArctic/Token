@@ -2,7 +2,11 @@ package token
 import "net/http"
 
 // Checks Authorization headers
-func Authorization( response http.ResponseWriter, request * http.Request ) [ ]Token {
+func Authorization( response http.ResponseWriter, request http.Request ) [ ]Token {
+	return ( & Config{ Secret , Service , Control } ).Authorization( response , request )
+}
+
+func ( self Config )Authorization( response http.ResponseWriter, request http.Request ) [ ]Token {
 	var tokens [ ]Token
 
 	if ( request.Header[ "Authorization" ] == nil || len( request.Header[ "Authorization" ] ) == 0 ) {

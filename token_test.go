@@ -9,6 +9,7 @@ func TestMain ( test * testing.T ) {
 	token.Ident = 100
 	token.Expire = 100
 	token.Payload = string( "Hello, World!" )
+	Secret = [ ]byte( "mh80rLXoDYqfG3eLwnhrmtU-ACLTWamPup6-rJ-5NCVKWg___LZ8IcSTgTpWW1IBLRckGNCEAij9kzWvUamiEXOCag5eeV63BeOxwIdySl52X-Fea1klrSIPDayhnmjYNimebugygZnknv-m2fhIJZVdVNRbrehrlELfMgHjeVzzt6j2m4dGseHkfa6JGjfmF33hBG1U4rvmMZ-3zFDGjHK1Wz4vyaBqqgTZ97lMP3vW289X020BGCK6NIcepgoU" )
 	test.Logf( "token: %v" , token.Binary( ) )
 
 	token , err = Parse( token.String( ) )
