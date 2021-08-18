@@ -14,7 +14,7 @@ type Token struct{
 	Secret [ ]byte;
 	Service uint16;
 	Ident uint64;
-	ladder uint32;	// Not in use yet
+	Ladder uint32;	// Todo: implement
 	Expire int64;
 	Payload interface{ };
 	sha224 [ sha256.Size224 ]byte;	// ?
@@ -81,7 +81,7 @@ func ( self Config )Cast( input [ ]byte ) ( Token , error ) {
 	index = binary.MaxVarintLen16
 	token.Ident = mu( binary.Uvarint( input[ index : index + binary.MaxVarintLen64 ] ) )[ 0 ].( uint64 )
 	index += binary.MaxVarintLen64
-	token.ladder = uint32( mu( binary.Uvarint( input[ index : index + binary.MaxVarintLen32 ] ) )[ 0 ].( uint64 ) )
+	token.Ladder = uint32( mu( binary.Uvarint( input[ index : index + binary.MaxVarintLen32 ] ) )[ 0 ].( uint64 ) )
 	index += binary.MaxVarintLen32
 	token.Expire = mu( binary.Varint( input[ index : index + binary.MaxVarintLen64 ] ) )[ 0 ].( int64 ) - time.Now( ).Unix( )
 	index += binary.MaxVarintLen64
@@ -124,7 +124,7 @@ func ( self Token ) Binary( ) [ ]byte {
 	index = binary.MaxVarintLen16
 	binary.PutUvarint( bytes[ index : ] , self.Ident )
 	index += binary.MaxVarintLen64
-	binary.PutUvarint( bytes[ index : ] , uint64 ( self.ladder ) )
+	binary.PutUvarint( bytes[ index : ] , uint64 ( self.Ladder ) )
 	index += binary.MaxVarintLen32
 	binary.PutVarint( bytes[ index : ] , self.Expire + time.Now( ).Unix( ) )
 	index += binary.MaxVarintLen64
