@@ -2,7 +2,7 @@
 // HTTP CONNECT proxy server
 package main
 import "flag"
-import "gitea.kona.cf/Kona/Token"
+import "github.com/KonaArctic/Token"
 import "os"
 
 func main( ) {
