@@ -1,3 +1,3 @@
-module github.com/KonaArctic/token
+module github.com/KonaArctic/Token
 
 go 1.15
