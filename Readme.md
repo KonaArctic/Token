@@ -1,4 +1,4 @@
-[![Go](https://github.com/KonaArctic/token/actions/workflows/go.yml/badge.svg)](https://github.com/KonaArctic/token/actions/workflows/go.yml)
+[![Tests](https://github.com/KonaArctic/token/actions/workflows/go.yml/badge.svg)](https://github.com/KonaArctic/token/actions/workflows/Tests.yml)
 
 Simple Stateless Tokens
 ============
