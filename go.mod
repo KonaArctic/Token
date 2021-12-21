@@ -1,3 +1,3 @@
-module gitea.kona.cf/Kona/Token
+module github.com/KonaArctic/token
 
 go 1.15
